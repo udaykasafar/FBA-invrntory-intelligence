@@ -1,0 +1,269 @@
+/* ==========================================================
+   FBA Inventory Intelligence Dashboard — custom styles
+   Layered on top of Tailwind (CDN). Keep selectors generic.
+   ========================================================== */
+
+/* ---------- Sidebar nav links ---------- */
+.nav-link {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.625rem 0.875rem;
+    border-radius: 0.5rem;
+    font-size: 0.875rem;
+    font-weight: 500;
+    color: #cbd5e1;          /* slate-300 */
+    transition: background-color 0.15s ease, color 0.15s ease;
+}
+.nav-link:hover {
+    background-color: #1e293b; /* slate-800 */
+    color: #ffffff;
+}
+.nav-link.active {
+    background-color: #4f46e5; /* brand-600 */
+    color: #ffffff;
+}
+
+/* ---------- File upload cards ---------- */
+.file-card {
+    background: #fff;
+    border: 1px solid #e2e8f0;   /* slate-200 */
+    border-radius: 0.75rem;
+    padding: 1rem;
+    transition: border-color 0.15s, box-shadow 0.15s;
+}
+.file-card:hover {
+    border-color: #6366f1;       /* brand-500 */
+    box-shadow: 0 4px 12px -4px rgba(99, 102, 241, 0.15);
+}
+
+.file-drop {
+    display: block;
+    border: 2px dashed #cbd5e1;  /* slate-300 */
+    border-radius: 0.5rem;
+    padding: 0.875rem;
+    text-align: center;
+    cursor: pointer;
+    transition: background-color 0.15s, border-color 0.15s;
+    background-color: #f8fafc;   /* slate-50 */
+}
+.file-drop:hover {
+    border-color: #4f46e5;       /* brand-600 */
+    background-color: #eef2ff;   /* brand-50 */
+}
+.file-input {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    opacity: 0;
+    pointer-events: none;
+}
+.file-label {
+    display: block;
+    font-size: 0.8rem;
+    font-weight: 500;
+    color: #475569;              /* slate-600 */
+    word-break: break-all;
+}
+.file-drop.has-file {
+    border-color: #10b981;       /* emerald-500 */
+    background-color: #ecfdf5;   /* emerald-50 */
+}
+.file-drop.has-file .file-label {
+    color: #047857;              /* emerald-700 */
+}
+
+/* ---------- Settings inputs ---------- */
+.setting-label {
+    display: block;
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: #475569;              /* slate-600 */
+    margin-bottom: 0.375rem;
+    text-transform: uppercase;
+    letter-spacing: 0.025em;
+}
+.setting-input {
+    width: 100%;
+    padding: 0.5rem 0.75rem;
+    border: 1px solid #cbd5e1;
+    border-radius: 0.5rem;
+    font-size: 0.875rem;
+    background-color: #fff;
+    color: #0f172a;
+    transition: border-color 0.15s, box-shadow 0.15s;
+}
+.setting-input:focus {
+    outline: none;
+    border-color: #6366f1;
+    box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.15);
+}
+
+/* ---------- KPI cards (gradient via Tailwind) ---------- */
+.kpi-card {
+    position: relative;
+    overflow: hidden;
+    padding: 1.25rem;
+    border-radius: 1rem;
+    color: #fff;
+    background-image: linear-gradient(135deg, var(--tw-gradient-stops));
+    box-shadow: 0 4px 12px -4px rgba(0,0,0,0.15);
+    min-height: 110px;
+}
+.kpi-card.from-indigo-500 { --tw-gradient-stops: #6366f1, #4f46e5; }
+.kpi-card.from-emerald-500 { --tw-gradient-stops: #10b981, #059669; }
+.kpi-card.from-rose-500 { --tw-gradient-stops: #f43f5e, #e11d48; }
+.kpi-card.from-amber-500 { --tw-gradient-stops: #f59e0b, #d97706; }
+.kpi-card.from-slate-500 { --tw-gradient-stops: #64748b, #334155; }
+.kpi-card.from-fuchsia-500 { --tw-gradient-stops: #d946ef, #9333ea; }
+
+.kpi-label {
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    opacity: 0.9;
+}
+.kpi-value {
+    font-size: 2rem;
+    font-weight: 800;
+    margin-top: 0.5rem;
+    line-height: 1;
+}
+.kpi-icon {
+    position: absolute;
+    right: 1rem;
+    bottom: 1rem;
+    width: 2.5rem;
+    height: 2.5rem;
+    opacity: 0.25;
+}
+
+/* ---------- Chart cards ---------- */
+.chart-card {
+    background: #fff;
+    border: 1px solid #e2e8f0;
+    border-radius: 1rem;
+    padding: 1.25rem;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+}
+.chart-title {
+    font-size: 0.875rem;
+    font-weight: 700;
+    color: #0f172a;
+    margin-bottom: 0.875rem;
+}
+
+/* ---------- Table ---------- */
+.th {
+    padding: 0.75rem 1rem;
+    text-align: left;
+    white-space: nowrap;
+    cursor: pointer;
+    user-select: none;
+}
+.th.sortable:hover { background-color: #f1f5f9; }
+.th .sort-indicator { margin-left: 0.25rem; opacity: 0.4; }
+.th.sorted .sort-indicator { opacity: 1; color: #4f46e5; }
+
+.td {
+    padding: 0.65rem 1rem;
+    white-space: nowrap;
+    color: #334155;
+    font-size: 0.85rem;
+}
+#data-table tbody tr:hover { background-color: #f8fafc; }
+
+/* ---------- Status badges ---------- */
+.badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.25rem;
+    padding: 0.25rem 0.625rem;
+    border-radius: 9999px;
+    font-size: 0.7rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.025em;
+    white-space: nowrap;
+}
+.badge-healthy   { background:#d1fae5; color:#047857; }
+.badge-low       { background:#fef3c7; color:#92400e; }
+.badge-critical  { background:#fee2e2; color:#b91c1c; }
+.badge-overstock { background:#fed7aa; color:#9a3412; }
+.badge-excess    { background:#f3e8ff; color:#7e22ce; }
+.badge-dead      { background:#e2e8f0; color:#334155; }
+
+/* ---------- Filters ---------- */
+.filter-input {
+    padding: 0.45rem 0.75rem;
+    font-size: 0.85rem;
+    border: 1px solid #cbd5e1;
+    border-radius: 0.5rem;
+    background: #fff;
+    color: #0f172a;
+    min-width: 180px;
+    transition: border-color 0.15s, box-shadow 0.15s;
+}
+.filter-input:focus {
+    outline: none;
+    border-color: #6366f1;
+    box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.15);
+}
+
+/* ---------- Buttons ---------- */
+.download-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.55rem 1rem;
+    background: #fff;
+    color: #4338ca;
+    border: 1px solid #c7d2fe;
+    border-radius: 0.5rem;
+    font-size: 0.85rem;
+    font-weight: 600;
+    transition: background-color 0.15s, color 0.15s;
+}
+.download-btn:hover { background:#eef2ff; }
+
+.page-btn {
+    padding: 0.4rem 0.875rem;
+    border: 1px solid #cbd5e1;
+    border-radius: 0.5rem;
+    background: #fff;
+    font-size: 0.8rem;
+    color: #334155;
+    transition: background-color 0.15s;
+}
+.page-btn:hover { background:#f1f5f9; }
+.page-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+
+/* ---------- Toast notifications ---------- */
+.toast-card {
+    padding: 0.875rem 1.25rem;
+    border-radius: 0.75rem;
+    background: #fff;
+    box-shadow: 0 10px 30px -10px rgba(0,0,0,0.25);
+    border-left: 4px solid #4f46e5;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    min-width: 280px;
+    max-width: 400px;
+    font-size: 0.875rem;
+}
+.toast-card.error   { border-left-color: #dc2626; }
+.toast-card.success { border-left-color: #10b981; }
+
+/* ---------- Scrollbar (subtle) ---------- */
+::-webkit-scrollbar { width: 10px; height: 10px; }
+::-webkit-scrollbar-track { background: #f1f5f9; }
+::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 5px; }
+::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+
+/* ---------- Responsive tweaks ---------- */
+@media (max-width: 768px) {
+    .kpi-value { font-size: 1.5rem; }
+    .filter-input { min-width: 140px; }
+}

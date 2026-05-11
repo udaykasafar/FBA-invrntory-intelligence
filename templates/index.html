@@ -1,0 +1,434 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>FBA Inventory Intelligence Dashboard</title>
+
+    <!-- Tailwind via CDN (no build step needed) -->
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+
+    <!-- Lucide icons -->
+    <script src="https://unpkg.com/lucide@0.453.0/dist/umd/lucide.min.js"></script>
+
+    <!-- Our custom CSS -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}" />
+
+    <script>
+        // Tailwind theme customization
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        brand: {
+                            50:  "#eef2ff",
+                            100: "#e0e7ff",
+                            500: "#6366f1",
+                            600: "#4f46e5",
+                            700: "#4338ca",
+                            900: "#1e1b4b",
+                        },
+                        sidebar: "#0f172a",
+                        sidebar2:"#1e293b",
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'system-ui', 'sans-serif'],
+                    },
+                },
+            },
+        };
+    </script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+</head>
+
+<body class="bg-slate-100 font-sans text-slate-800 antialiased">
+
+<div class="flex min-h-screen">
+
+    <!-- =============== SIDEBAR =============== -->
+    <aside class="hidden md:flex md:flex-col w-64 bg-sidebar text-slate-200">
+        <div class="px-6 py-6 border-b border-slate-700">
+            <div class="flex items-center gap-3">
+                <div class="w-10 h-10 bg-brand-600 rounded-xl flex items-center justify-center">
+                    <i data-lucide="package-search" class="w-6 h-6 text-white"></i>
+                </div>
+                <div>
+                    <h1 class="text-base font-bold leading-tight text-white">FBA Intel</h1>
+                    <p class="text-xs text-slate-400">Inventory Dashboard</p>
+                </div>
+            </div>
+        </div>
+
+        <nav class="flex-1 px-3 py-4 space-y-1">
+            <a href="#upload" class="nav-link active">
+                <i data-lucide="upload-cloud" class="w-5 h-5"></i> Upload Files
+            </a>
+            <a href="#kpis" class="nav-link">
+                <i data-lucide="layout-dashboard" class="w-5 h-5"></i> Overview
+            </a>
+            <a href="#charts" class="nav-link">
+                <i data-lucide="bar-chart-3" class="w-5 h-5"></i> Charts
+            </a>
+            <a href="#table" class="nav-link">
+                <i data-lucide="table-2" class="w-5 h-5"></i> SKU Table
+            </a>
+            <a href="#downloads" class="nav-link">
+                <i data-lucide="download" class="w-5 h-5"></i> Downloads
+            </a>
+            <a href="#shipments" class="nav-link">
+                <i data-lucide="truck" class="w-5 h-5"></i> Shipments
+            </a>
+        </nav>
+
+        <div class="px-4 py-4 border-t border-slate-700 text-xs text-slate-400">
+            <p class="font-semibold text-slate-300">FBA Inventory Intelligence</p>
+            <p>v1.0 · Local Edition</p>
+        </div>
+    </aside>
+
+    <!-- =============== MAIN CONTENT =============== -->
+    <main class="flex-1 flex flex-col">
+
+        <!-- Top bar -->
+        <header class="bg-white border-b border-slate-200 px-6 py-4 flex items-center justify-between sticky top-0 z-10">
+            <div>
+                <h2 class="text-lg font-bold text-slate-900">Inventory Intelligence</h2>
+                <p class="text-xs text-slate-500">Detect excess FBA inventory · v1.0</p>
+            </div>
+            <div class="flex items-center gap-2 text-sm">
+                <span class="hidden sm:inline-flex items-center gap-1 px-3 py-1.5 rounded-full bg-emerald-50 text-emerald-700 text-xs font-medium">
+                    <span class="w-2 h-2 bg-emerald-500 rounded-full"></span> Local Mode
+                </span>
+            </div>
+        </header>
+
+        <div class="p-6 space-y-6 max-w-[1500px] w-full mx-auto">
+
+            <!-- =============== UPLOAD SECTION =============== -->
+            <section id="upload" class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6">
+                <div class="flex items-center gap-2 mb-1">
+                    <i data-lucide="upload-cloud" class="w-5 h-5 text-brand-600"></i>
+                    <h3 class="text-base font-bold text-slate-900">Upload Files</h3>
+                </div>
+                <p class="text-sm text-slate-500 mb-5">
+                    Upload your three Excel / CSV files. Required columns are listed under each box.
+                </p>
+
+                <form id="upload-form" class="space-y-6">
+
+                    <!-- File grid -->
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+
+                        <!-- Shipment -->
+                        <div class="file-card">
+                            <div class="flex items-start gap-3">
+                                <div class="w-10 h-10 rounded-lg bg-blue-50 text-blue-600 flex items-center justify-center shrink-0">
+                                    <i data-lucide="truck" class="w-5 h-5"></i>
+                                </div>
+                                <div class="flex-1">
+                                    <h4 class="font-semibold text-sm text-slate-900">Shipment File</h4>
+                                    <p class="text-xs text-slate-500 mt-0.5">
+                                        Loading Date, Appointment ID, Shipment ID, SKU, Qty
+                                    </p>
+                                </div>
+                            </div>
+                            <label class="file-drop mt-3">
+                                <input type="file" name="shipment" accept=".xlsx,.xls,.csv" required class="file-input" />
+                                <span class="file-label" data-default="Choose file…">Choose file…</span>
+                            </label>
+                        </div>
+
+                        <!-- Sales -->
+                        <div class="file-card">
+                            <div class="flex items-start gap-3">
+                                <div class="w-10 h-10 rounded-lg bg-emerald-50 text-emerald-600 flex items-center justify-center shrink-0">
+                                    <i data-lucide="trending-up" class="w-5 h-5"></i>
+                                </div>
+                                <div class="flex-1">
+                                    <h4 class="font-semibold text-sm text-slate-900">45 Days Sales File</h4>
+                                    <p class="text-xs text-slate-500 mt-0.5">
+                                        ASIN, SKU, FNSKU, Qty
+                                    </p>
+                                </div>
+                            </div>
+                            <label class="file-drop mt-3">
+                                <input type="file" name="sales" accept=".xlsx,.xls,.csv" required class="file-input" />
+                                <span class="file-label" data-default="Choose file…">Choose file…</span>
+                            </label>
+                        </div>
+
+                        <!-- Stock -->
+                        <div class="file-card">
+                            <div class="flex items-start gap-3">
+                                <div class="w-10 h-10 rounded-lg bg-amber-50 text-amber-600 flex items-center justify-center shrink-0">
+                                    <i data-lucide="warehouse" class="w-5 h-5"></i>
+                                </div>
+                                <div class="flex-1">
+                                    <h4 class="font-semibold text-sm text-slate-900">FBA Stock Report</h4>
+                                    <p class="text-xs text-slate-500 mt-0.5">
+                                        SKU, ASIN, FNSKU, Qty
+                                    </p>
+                                </div>
+                            </div>
+                            <label class="file-drop mt-3">
+                                <input type="file" name="stock" accept=".xlsx,.xls,.csv" required class="file-input" />
+                                <span class="file-label" data-default="Choose file…">Choose file…</span>
+                            </label>
+                        </div>
+                    </div>
+
+                    <!-- Settings -->
+                    <div class="bg-slate-50 border border-slate-200 rounded-xl p-4">
+                        <div class="flex items-center gap-2 mb-3">
+                            <i data-lucide="settings" class="w-4 h-4 text-slate-600"></i>
+                            <h4 class="font-semibold text-sm text-slate-900">Settings</h4>
+                        </div>
+                        <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+                            <div>
+                                <label class="setting-label">Transit Days</label>
+                                <input type="number" name="transit_days" value="10" min="0" class="setting-input" />
+                            </div>
+                            <div>
+                                <label class="setting-label">Amazon GRN Days</label>
+                                <input type="number" name="grn_days" value="7" min="0" class="setting-input" />
+                            </div>
+                            <div>
+                                <label class="setting-label">Target FBA Days</label>
+                                <input type="number" name="target_days" value="45" min="1" class="setting-input" />
+                            </div>
+                            <div>
+                                <label class="setting-label">Total Lead Time</label>
+                                <input type="text" id="lead-time-display" value="17 days" readonly
+                                    class="setting-input bg-slate-100 cursor-not-allowed" />
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Action buttons -->
+                    <div class="flex flex-wrap items-center gap-3">
+                        <button type="submit" id="analyze-btn"
+                            class="inline-flex items-center gap-2 px-5 py-2.5 bg-brand-600 hover:bg-brand-700 text-white font-semibold text-sm rounded-lg shadow-sm transition disabled:opacity-50 disabled:cursor-not-allowed">
+                            <i data-lucide="sparkles" class="w-4 h-4"></i>
+                            <span id="analyze-btn-label">Run Analysis</span>
+                        </button>
+                        <button type="reset" id="reset-btn"
+                            class="inline-flex items-center gap-2 px-5 py-2.5 bg-white hover:bg-slate-50 text-slate-700 border border-slate-300 font-semibold text-sm rounded-lg transition">
+                            <i data-lucide="rotate-ccw" class="w-4 h-4"></i> Reset
+                        </button>
+                        <div id="status-msg" class="text-sm"></div>
+                    </div>
+                </form>
+            </section>
+
+            <!-- =============== RESULTS (hidden until run) =============== -->
+            <div id="results-wrap" class="space-y-6 hidden">
+
+                <!-- KPI cards -->
+                <section id="kpis">
+                    <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
+                        <div class="kpi-card from-indigo-500 to-indigo-600">
+                            <div class="kpi-label">Total SKUs</div>
+                            <div class="kpi-value" id="kpi-total">0</div>
+                            <i data-lucide="boxes" class="kpi-icon"></i>
+                        </div>
+                        <div class="kpi-card from-emerald-500 to-emerald-600">
+                            <div class="kpi-label">Healthy</div>
+                            <div class="kpi-value" id="kpi-healthy">0</div>
+                            <i data-lucide="check-circle-2" class="kpi-icon"></i>
+                        </div>
+                        <div class="kpi-card from-rose-500 to-rose-600">
+                            <div class="kpi-label">Critical</div>
+                            <div class="kpi-value" id="kpi-critical">0</div>
+                            <i data-lucide="alert-triangle" class="kpi-icon"></i>
+                        </div>
+                        <div class="kpi-card from-amber-500 to-amber-600">
+                            <div class="kpi-label">Overstock</div>
+                            <div class="kpi-value" id="kpi-overstock">0</div>
+                            <i data-lucide="layers" class="kpi-icon"></i>
+                        </div>
+                        <div class="kpi-card from-slate-500 to-slate-700">
+                            <div class="kpi-label">Dead Stock</div>
+                            <div class="kpi-value" id="kpi-dead">0</div>
+                            <i data-lucide="skull" class="kpi-icon"></i>
+                        </div>
+                        <div class="kpi-card from-fuchsia-500 to-purple-600">
+                            <div class="kpi-label">Total Excess Qty</div>
+                            <div class="kpi-value" id="kpi-excess-qty">0</div>
+                            <i data-lucide="package-x" class="kpi-icon"></i>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Charts -->
+                <section id="charts" class="grid grid-cols-1 lg:grid-cols-3 gap-4">
+                    <div class="chart-card lg:col-span-1">
+                        <h4 class="chart-title">Status Distribution</h4>
+                        <div class="relative" style="height: 280px;">
+                            <canvas id="chart-status"></canvas>
+                        </div>
+                    </div>
+                    <div class="chart-card lg:col-span-2">
+                        <h4 class="chart-title">Top 10 Excess Inventory SKUs</h4>
+                        <div class="relative" style="height: 280px;">
+                            <canvas id="chart-top-excess"></canvas>
+                        </div>
+                    </div>
+                    <div class="chart-card lg:col-span-3">
+                        <h4 class="chart-title">Stock Health Overview</h4>
+                        <div class="relative" style="height: 240px;">
+                            <canvas id="chart-health"></canvas>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Downloads -->
+                <section id="downloads" class="bg-white rounded-2xl shadow-sm border border-slate-200 p-5">
+                    <div class="flex flex-wrap items-center justify-between gap-4">
+                        <div>
+                            <h3 class="text-base font-bold text-slate-900">Download Reports</h3>
+                            <p class="text-xs text-slate-500">Export analysis to Excel for sharing.</p>
+                        </div>
+                        <div class="flex flex-wrap gap-2">
+                            <button class="download-btn" data-kind="full">
+                                <i data-lucide="file-spreadsheet" class="w-4 h-4"></i>
+                                Final Output
+                            </button>
+                            <button class="download-btn" data-kind="excess">
+                                <i data-lucide="package-x" class="w-4 h-4"></i>
+                                Excess Inventory
+                            </button>
+                            <button class="download-btn" data-kind="dead">
+                                <i data-lucide="skull" class="w-4 h-4"></i>
+                                Dead Stock
+                            </button>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Table -->
+                <section id="table" class="bg-white rounded-2xl shadow-sm border border-slate-200">
+
+                    <div class="p-5 border-b border-slate-200 flex flex-wrap items-center justify-between gap-4">
+                        <div>
+                            <h3 class="text-base font-bold text-slate-900">SKU Detail Table</h3>
+                            <p class="text-xs text-slate-500">
+                                <span id="table-count">0</span> SKUs · click headers to sort
+                            </p>
+                        </div>
+
+                        <div class="flex flex-wrap gap-2 items-center">
+                            <div class="relative">
+                                <i data-lucide="search" class="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-slate-400"></i>
+                                <input id="search-sku" placeholder="Search SKU…" class="filter-input pl-9" />
+                            </div>
+                            <div class="relative">
+                                <i data-lucide="search" class="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-slate-400"></i>
+                                <input id="search-asin" placeholder="Search ASIN…" class="filter-input pl-9" />
+                            </div>
+                            <select id="filter-status" class="filter-input">
+                                <option value="">All Status</option>
+                                <option value="Healthy">Healthy</option>
+                                <option value="Low Stock">Low Stock</option>
+                                <option value="Critical">Critical</option>
+                                <option value="Overstock">Overstock</option>
+                                <option value="Excess Inventory">Excess Inventory</option>
+                                <option value="Dead Stock">Dead Stock</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="overflow-x-auto">
+                        <table class="min-w-full text-sm" id="data-table">
+                            <thead class="bg-slate-50 text-slate-600 uppercase text-xs font-semibold">
+                                <tr>
+                                    <th class="th sortable" data-key="SKU">SKU</th>
+                                    <th class="th sortable" data-key="ASIN">ASIN</th>
+                                    <th class="th sortable" data-key="FNSKU">FNSKU</th>
+                                    <th class="th sortable text-right" data-key="45 Days Sales">45D Sales</th>
+                                    <th class="th sortable text-right" data-key="Daily Sales">Daily Sales</th>
+                                    <th class="th sortable text-right" data-key="Current FBA Stock">FBA Stock</th>
+                                    <th class="th sortable text-right" data-key="Incoming Shipment Qty">Incoming</th>
+                                    <th class="th sortable text-right" data-key="Lead Time">Lead Time</th>
+                                    <th class="th sortable text-right" data-key="Stock Before Arrival">Remaining</th>
+                                    <th class="th sortable text-right" data-key="Projected Stock">Projected</th>
+                                    <th class="th sortable text-right" data-key="Required Qty">Required</th>
+                                    <th class="th sortable text-right" data-key="Excess Qty">Excess</th>
+                                    <th class="th sortable text-right" data-key="Days Cover">Days Cover</th>
+                                    <th class="th sortable" data-key="Status">Status</th>
+                                    <th class="th sortable text-right" data-key="Recommended Shipment Qty">Recommended</th>
+                                </tr>
+                            </thead>
+                            <tbody id="data-table-body" class="divide-y divide-slate-100"></tbody>
+                        </table>
+                    </div>
+
+                    <div class="p-4 border-t border-slate-200 flex justify-between items-center text-xs text-slate-500">
+                        <span id="table-info">No data</span>
+                        <div class="flex gap-2">
+                            <button id="page-prev" class="page-btn">Prev</button>
+                            <span id="page-info" class="px-2 py-1.5">1 / 1</span>
+                            <button id="page-next" class="page-btn">Next</button>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Shipments Section -->
+                <section id="shipments" class="bg-white rounded-2xl shadow-sm border border-slate-200">
+                    <div class="p-5 border-b border-slate-200">
+                        <h3 class="text-base font-bold text-slate-900">Shipment Details</h3>
+                        <p class="text-xs text-slate-500 mt-1">
+                            Breakdown of quantities by shipment for each SKU
+                        </p>
+                    </div>
+
+                    <div class="p-5">
+                        <div id="shipment-details" class="space-y-4">
+                            <!-- Shipment details will be populated here -->
+                        </div>
+                    </div>
+                </section>
+            </div>
+
+            <!-- =============== EMPTY STATE =============== -->
+            <div id="empty-state" class="bg-white rounded-2xl shadow-sm border border-dashed border-slate-300 p-10 text-center">
+                <i data-lucide="upload-cloud" class="w-12 h-12 mx-auto text-slate-300"></i>
+                <h3 class="mt-3 text-lg font-semibold text-slate-700">No analysis yet</h3>
+                <p class="text-sm text-slate-500 mt-1">
+                    Upload your three files above and click <span class="font-semibold">Run Analysis</span> to see the dashboard.
+                </p>
+            </div>
+
+        </div>
+
+        <footer class="px-6 py-4 text-center text-xs text-slate-400 border-t border-slate-200 bg-white">
+            FBA Inventory Intelligence Dashboard · Local mode · Built with Flask + Tailwind + Chart.js
+        </footer>
+
+    </main>
+</div>
+
+<!-- Toast container -->
+<div id="toast" class="fixed bottom-6 right-6 z-50 hidden"></div>
+
+<!-- Loading overlay -->
+<div id="loading-overlay" class="fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-50 hidden items-center justify-center">
+    <div class="bg-white rounded-2xl px-8 py-6 shadow-xl flex items-center gap-4">
+        <div class="w-8 h-8 border-4 border-brand-600 border-t-transparent rounded-full animate-spin"></div>
+        <div>
+            <div class="font-semibold text-slate-900">Analyzing files…</div>
+            <div class="text-xs text-slate-500">This usually takes a few seconds.</div>
+        </div>
+    </div>
+</div>
+
+<!-- Our scripts -->
+<script src="{{ url_for('static', filename='js/script.js') }}"></script>
+<script>
+    // Render Lucide icons after DOM is ready
+    lucide.createIcons();
+</script>
+</body>
+</html>
